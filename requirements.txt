@@ -4,6 +4,8 @@ asgiref>=3.8.0
 sqlparse>=0.5.0
 tzdata>=2024.1
 
+gunicorn
+
 # Optional: To use MySQL instead of SQLite, install either:
 # mysqlclient>=2.2.4
 # or
