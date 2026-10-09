@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Categories | DevBlog{% endblock %}
+
+{% block content %}
+<div class="py-5 bg-white border-bottom">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 small">
+                <li class="breadcrumb-item"><a href="{% url 'blog:home' %}">Home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Categories</li>
+            </ol>
+        </nav>
+        <h1 class="fw-bold mb-1" style="color: var(--color-navy-950);">Explore by Topic & Category</h1>
+        <p class="text-muted mb-0">Browse through curated articles across software engineering, architecture, and UI design.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        {% for cat in categories %}
+        <div class="col-lg-4 col-md-6">
+            <a href="{% url 'blog:category_posts' cat.slug %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 transition-hover bg-white" style="border: 1px solid var(--color-border) !important;">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="category-icon-box" style="background: {{ cat.color|default:'#0d9488' }};">
+                            <i class="bi {{ cat.icon|default:'bi-folder' }}"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">{{ cat.name }}</h5>
+                            <span class="badge bg-light text-muted border rounded-pill">{{ cat.num_posts }} article{{ cat.num_posts|pluralize }}</span>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-3 flex-grow-1">
+                        {{ cat.description|default:"Explore in-depth articles, tutorials, and discussions in this topic." }}
+                    </p>
+                    <div class="d-flex align-items-center justify-content-between pt-2 border-top text-teal-500 fw-semibold small">
+                        <span>Browse articles</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12 py-5 text-center text-muted">
+            <p>No categories found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

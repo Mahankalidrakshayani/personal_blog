@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign In | DevBlog Author Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Card Header -->
+                <div class="p-4 text-center text-white" style="background: var(--gradient-card-header);">
+                    <div class="brand-icon mx-auto mb-2" style="width: 44px; height: 44px; font-size: 1.3rem;">
+                        <i class="bi bi-person-lock"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1">Author Sign In</h3>
+                    <p class="text-white-50 small mb-0">Enter your credentials to access your author studio.</p>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body p-4 p-md-5 bg-white">
+                    {% if form.errors %}
+                    <div class="alert alert-danger rounded-3 mb-4 py-2 small d-flex align-items-center">
+                        <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                        <div>Invalid username or password. Please try again.</div>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+
+                        <div class="mb-3">
+                            <label class="form-label" for="id_username">
+                                <i class="bi bi-person text-teal-500 me-1"></i> Username
+                            </label>
+                            <input type="text" name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required class="form-control" id="id_username" placeholder="Enter username">
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label mb-0" for="id_password">
+                                    <i class="bi bi-key text-teal-500 me-1"></i> Password
+                                </label>
+                            </div>
+                            <input type="password" name="password" autocomplete="current-password" required class="form-control" id="id_password" placeholder="Enter password">
+                        </div>
+
+                        <button type="submit" class="btn btn-teal w-100 py-2 fs-6 fw-bold shadow-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Studio
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top small text-muted">
+                        Don't have an author account yet? 
+                        <a href="{% url 'register' %}" class="fw-bold text-teal-500">Create one here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

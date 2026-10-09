@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile Settings | DevBlog{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom mb-4">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-2 small">
+                <li class="breadcrumb-item"><a href="{% url 'blog:home' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'blog:dashboard' %}">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Profile Settings</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="fw-bold mb-1" style="color: var(--color-navy-950);">Author Profile Settings</h1>
+                <p class="text-muted mb-0">Update your public author identity, bio, avatar, and social links.</p>
+            </div>
+            <a href="{% url 'blog:author_posts' user.username %}" class="btn btn-outline-teal btn-sm" target="_blank">
+                <i class="bi bi-box-arrow-up-right me-1"></i> View Public Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="form-card">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <h5 class="fw-bold mb-3 text-navy border-bottom pb-2">
+                        <i class="bi bi-person-badge text-teal-500 me-2"></i> Account Details
+                    </h5>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ user_form.first_name.id_for_label }}">First Name</label>
+                            {{ user_form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ user_form.last_name.id_for_label }}">Last Name</label>
+                            {{ user_form.last_name }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="{{ user_form.email.id_for_label }}">Email Address</label>
+                            {{ user_form.email }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-3 text-navy border-bottom pb-2">
+                        <i class="bi bi-card-text text-teal-500 me-2"></i> Public Author Bio
+                    </h5>
+
+                    <div class="row g-3 mb-4">
+                        <!-- Headline -->
+                        <div class="col-12">
+                            <label class="form-label" for="{{ profile_form.headline.id_for_label }}">Professional Headline</label>
+                            {{ profile_form.headline }}
+                            <small class="text-muted">Example: Senior Python Developer & Open Source Contributor</small>
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="col-12">
+                            <label class="form-label" for="{{ profile_form.bio.id_for_label }}">Author Bio</label>
+                            {{ profile_form.bio }}
+                        </div>
+
+                        <!-- Avatar -->
+                        <div class="col-12">
+                            <label class="form-label" for="{{ profile_form.avatar.id_for_label }}">Profile Picture / Avatar</label>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if user.profile.avatar %}
+                                    <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="rounded-circle" style="width: 64px; height: 64px; object-fit: cover; border: 2px solid var(--color-teal-400);">
+                                {% else %}
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 64px; height: 64px; background: var(--gradient-purple-teal); font-size: 1.5rem;">
+                                        {{ user.username|slice:":1"|upper }}
+                                    </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    {{ profile_form.avatar }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-3 text-navy border-bottom pb-2">
+                        <i class="bi bi-share text-teal-500 me-2"></i> Social & Web Links
+                    </h5>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ profile_form.website.id_for_label }}"><i class="bi bi-globe me-1 text-muted"></i> Personal Website</label>
+                            {{ profile_form.website }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ profile_form.github.id_for_label }}"><i class="bi bi-github me-1 text-muted"></i> GitHub Profile</label>
+                            {{ profile_form.github }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ profile_form.twitter.id_for_label }}"><i class="bi bi-twitter-x me-1 text-muted"></i> Twitter / X Handle</label>
+                            {{ profile_form.twitter }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="{{ profile_form.linkedin.id_for_label }}"><i class="bi bi-linkedin me-1 text-muted"></i> LinkedIn Profile</label>
+                            {{ profile_form.linkedin }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <a href="{% url 'blog:dashboard' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-teal px-4 py-2">
+                            <i class="bi bi-check2-circle me-1"></i> Save Profile Details
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

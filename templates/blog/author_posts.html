@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load blog_extras %}
+
+{% block title %}Articles by {{ author_user.get_full_name|default:author_user.username }} | DevBlog{% endblock %}
+
+{% block content %}
+<!-- Author Profile Header -->
+<div class="py-5" style="background: linear-gradient(135deg, #070d1e 0%, #1e1b4b 50%, #0d9488 100%); color: #ffffff;">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-auto">
+                {% if profile.avatar %}
+                    <img src="{{ profile.avatar.url }}" alt="{{ author_user.username }}" class="rounded-circle shadow-lg" style="width: 110px; height: 110px; object-fit: cover; border: 4px solid var(--color-teal-400);">
+                {% else %}
+                    <div class="rounded-circle shadow-lg d-flex align-items-center justify-content-center text-white fw-bold" style="width: 110px; height: 110px; background: var(--gradient-purple-teal); font-size: 2.8rem; border: 4px solid var(--color-teal-400);">
+                        {{ author_user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col">
+                <span class="badge bg-white bg-opacity-10 text-teal-300 border border-white border-opacity-25 px-3 py-1 rounded-pill mb-2">
+                    Author Profile
+                </span>
+                <h1 class="fw-bold mb-1 text-white">{{ author_user.get_full_name|default:author_user.username }}</h1>
+                <p class="text-teal-300 mb-2 fw-semibold">{{ profile.headline|default:"Contributing Writer" }}</p>
+                <p class="text-white-50 mb-3" style="max-width: 650px;">{{ profile.bio|default:"Sharing software engineering and technical writing on DevBlog." }}</p>
+
+                <div class="d-flex flex-wrap gap-3 small">
+                    {% if profile.website %}
+                        <a href="{{ profile.website }}" target="_blank" class="text-white text-decoration-none"><i class="bi bi-globe me-1 text-teal-400"></i> Website</a>
+                    {% endif %}
+                    {% if profile.github %}
+                        <a href="{{ profile.github }}" target="_blank" class="text-white text-decoration-none"><i class="bi bi-github me-1 text-teal-400"></i> GitHub</a>
+                    {% endif %}
+                    {% if profile.twitter %}
+                        <a href="{{ profile.twitter }}" target="_blank" class="text-white text-decoration-none"><i class="bi bi-twitter-x me-1 text-teal-400"></i> Twitter</a>
+                    {% endif %}
+                    {% if profile.linkedin %}
+                        <a href="{{ profile.linkedin }}" target="_blank" class="text-white text-decoration-none"><i class="bi bi-linkedin me-1 text-teal-400"></i> LinkedIn</a>
+                    {% endif %}
+                    <span class="text-white-50">
+                        <i class="bi bi-journal-text me-1 text-teal-400"></i> {{ total_count }} Published Article{{ total_count|pluralize }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <h3 class="fw-bold mb-4" style="color: var(--color-navy-950);">
+        Published Articles by {{ author_user.first_name|default:author_user.username }}
+    </h3>
+
+    <div class="row g-4">
+        {% for post in page_obj %}
+        <div class="col-lg-4 col-md-6">
+            <article class="card-blog">
+                <div class="card-blog-img-wrapper">
+                    {% if post.featured_image %}
+                        <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="card-blog-img">
+                    {% else %}
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #1c2541, #312e81);">
+                            <i class="bi bi-file-earmark-code display-5 text-teal-300 opacity-50"></i>
+                        </div>
+                    {% endif %}
+                    {% if post.category %}
+                    <span class="card-badge-category">
+                        {{ post.category.name }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="card-blog-body">
+                    <div class="card-blog-meta">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ post.published_at|date:"M d, Y"|default:post.created_at|date:"M d, Y" }}</span>
+                        <span>•</span>
+                        <span><i class="bi bi-stopwatch me-1"></i>{{ post.reading_time|reading_badge }}</span>
+                    </div>
+
+                    <h3 class="card-blog-title">
+                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                    </h3>
+
+                    <p class="card-blog-summary">
+                        {{ post.summary|truncatechars:120 }}
+                    </p>
+
+                    <div class="card-blog-footer">
+                        <div class="text-muted small">
+                            <i class="bi bi-calendar-event me-1"></i> {{ post.published_at|date:"M Y" }}
+                        </div>
+                        <div class="text-muted small d-flex gap-2">
+                            <span><i class="bi bi-eye me-1"></i>{{ post.views_count }}</span>
+                            <span><i class="bi bi-chat-dots me-1"></i>{{ post.comment_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        {% empty %}
+        <div class="col-12 py-5 text-center text-muted">
+            <div class="bg-white p-5 rounded-4 shadow-sm border mx-auto" style="max-width: 500px;">
+                <i class="bi bi-journal-x display-4 text-muted mb-3 d-block"></i>
+                <h4 class="fw-bold">No articles published yet</h4>
+                <p class="text-muted">This author hasn't published any public stories yet.</p>
+                <a href="{% url 'blog:post_list' %}" class="btn btn-teal">Explore Other Writers</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="d-flex justify-content-center mt-5">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-custom">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

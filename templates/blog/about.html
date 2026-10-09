@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About | DevBlog — Personal Tech Blog{% endblock %}
+
+{% block content %}
+<!-- About Hero -->
+<section class="py-5" style="background: var(--gradient-hero); color: #ffffff;">
+    <div class="container text-center py-4">
+        <span class="badge bg-white bg-opacity-10 text-teal-300 border border-white border-opacity-25 px-3 py-2 rounded-pill fw-bold mb-3">
+            <i class="bi bi-info-circle me-1"></i> About This Platform
+        </span>
+        <h1 class="display-5 fw-bold mb-3 text-white">
+            Engineering, Architecture & <span class="hero-title-highlight">Creative Code</span>
+        </h1>
+        <p class="text-white-50 mx-auto fs-5" style="max-width: 700px;">
+            A modern personal publishing platform designed for sharing software engineering insights, full-stack development patterns, and technical discoveries.
+        </p>
+    </div>
+</section>
+
+<!-- Content Sections -->
+<div class="container py-5">
+    <div class="row g-5 align-items-center mb-5">
+        <div class="col-lg-6">
+            <span class="badge bg-light text-teal-600 border border-teal-200 px-3 py-1 rounded-pill fw-bold mb-2" style="color: var(--color-teal-600); border-color: var(--color-teal-300);">
+                The Mission
+            </span>
+            <h2 class="fw-bold mb-3" style="color: var(--color-navy-950);">Why DevBlog Exists</h2>
+            <p class="text-secondary leading-relaxed">
+                As developers, the best way to solidify architectural concepts, backend optimizations, and frontend patterns is to document and share them openly with peers.
+            </p>
+            <p class="text-secondary leading-relaxed">
+                DevBlog was created as a complete, lightweight, and modern personal blog website powered by Python and Django. It provides clean separation between public reading, author publishing studio, and draft management.
+            </p>
+
+            <div class="row g-3 mt-2">
+                <div class="col-sm-4">
+                    <div class="p-3 bg-white border rounded-3 text-center shadow-sm">
+                        <h3 class="fw-bold text-teal-500 mb-0">{{ posts_count }}</h3>
+                        <small class="text-muted fw-semibold">Articles</small>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="p-3 bg-white border rounded-3 text-center shadow-sm">
+                        <h3 class="fw-bold text-purple-600 mb-0">{{ categories_count }}</h3>
+                        <small class="text-muted fw-semibold">Categories</small>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="p-3 bg-white border rounded-3 text-center shadow-sm">
+                        <h3 class="fw-bold text-orange-500 mb-0">{{ authors_count }}</h3>
+                        <small class="text-muted fw-semibold">Authors</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #1c2541, #312e81); color: #fff;">
+                <div class="card-body p-4 p-md-5">
+                    <h4 class="fw-bold mb-3 text-white"><i class="bi bi-stack text-teal-300 me-2"></i> Built With Modern Tech</h4>
+                    <ul class="list-unstyled d-flex flex-column gap-3 mb-4">
+                        <li class="d-flex align-items-center gap-3">
+                            <span class="badge bg-teal-500 text-white rounded-pill p-2"><i class="bi bi-check2"></i></span>
+                            <div>
+                                <strong>Python & Django Framework:</strong> Robust ORM, URL routing, CSRF protection, and session security.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <span class="badge bg-teal-500 text-white rounded-pill p-2"><i class="bi bi-check2"></i></span>
+                            <div>
+                                <strong>Database:</strong> SQLite by default for instant local setup, with native support to toggle to MySQL.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <span class="badge bg-teal-500 text-white rounded-pill p-2"><i class="bi bi-check2"></i></span>
+                            <div>
+                                <strong>Pillow Imaging:</strong> Dynamic banner graphics generation and user media handling.
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-center gap-3">
+                            <span class="badge bg-teal-500 text-white rounded-pill p-2"><i class="bi bi-check2"></i></span>
+                            <div>
+                                <strong>Modern UI / CSS3:</strong> Navy-blue, Teal accents, Purple gradients, and Bootstrap 5.3 responsiveness.
+                            </div>
+                        </li>
+                    </ul>
+                    <a href="{% url 'blog:post_list' %}" class="btn btn-teal w-100 py-2">
+                        Start Reading Articles <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Author Showcase Card -->
+    {% if admin_user %}
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-5 bg-white" style="border: 1px solid var(--color-border) !important;">
+        <div class="row align-items-center g-4">
+            <div class="col-md-auto text-center">
+                {% if admin_user.profile.avatar %}
+                    <img src="{{ admin_user.profile.avatar.url }}" alt="{{ admin_user.username }}" class="rounded-circle shadow" style="width: 110px; height: 110px; object-fit: cover; border: 3px solid var(--color-teal-400);">
+                {% else %}
+                    <div class="rounded-circle shadow mx-auto d-flex align-items-center justify-content-center text-white fw-bold" style="width: 110px; height: 110px; background: var(--gradient-purple-teal); font-size: 2.5rem; border: 3px solid var(--color-teal-400);">
+                        {{ admin_user.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md">
+                <span class="badge bg-light text-muted border mb-2">Lead Author & Maintainer</span>
+                <h3 class="fw-bold mb-1" style="color: var(--color-navy-950);">{{ admin_user.get_full_name|default:admin_user.username }}</h3>
+                <p class="text-teal-600 fw-semibold mb-2">{{ admin_user.profile.headline|default:"Software Architect & Tech Blogger" }}</p>
+                <p class="text-secondary mb-3">{{ admin_user.profile.bio|default:"Sharing stories, tutorials, and architectural insights on programming and web technologies." }}</p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{% url 'blog:author_posts' admin_user.username %}" class="btn btn-sm btn-outline-teal">
+                        <i class="bi bi-journal-text me-1"></i> View Articles
+                    </a>
+                    {% if admin_user.profile.website %}
+                    <a href="{{ admin_user.profile.website }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-globe me-1"></i> Website
+                    </a>
+                    {% endif %}
+                    {% if admin_user.profile.github %}
+                    <a href="{{ admin_user.profile.github }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-github me-1"></i> GitHub
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

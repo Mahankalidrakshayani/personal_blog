@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Post | Confirmation{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-danger text-white p-4 text-center">
+                    <i class="bi bi-exclamation-triangle-fill display-4 mb-2 d-block"></i>
+                    <h3 class="fw-bold mb-1">Confirm Post Deletion</h3>
+                    <p class="mb-0 text-white-50">This action cannot be undone.</p>
+                </div>
+                
+                <div class="card-body p-4 text-center">
+                    <p class="text-secondary mb-4">
+                        Are you sure you want to permanently delete the blog post titled:
+                    </p>
+                    
+                    <div class="p-3 bg-light rounded-3 border mb-4">
+                        <h5 class="fw-bold text-navy mb-1">{{ post.title }}</h5>
+                        <small class="text-muted">
+                            Category: {{ post.category.name|default:"Uncategorized" }} • 
+                            Status: <span class="badge {% if post.status == 'published' %}badge-status-published{% else %}badge-status-draft{% endif %}">{{ post.status|title }}</span>
+                        </small>
+                    </div>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'blog:dashboard' %}" class="btn btn-outline-secondary px-4">
+                                Cancel, Keep Post
+                            </a>
+                            <button type="submit" class="btn btn-danger px-4">
+                                <i class="bi bi-trash3-fill me-1"></i> Yes, Delete Permanently
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

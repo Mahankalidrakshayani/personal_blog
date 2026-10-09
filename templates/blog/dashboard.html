@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load blog_extras %}
+
+{% block title %}Author Studio Dashboard | DevBlog{% endblock %}
+
+{% block content %}
+<div class="py-4 bg-white border-bottom">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small">
+                        <li class="breadcrumb-item"><a href="{% url 'blog:home' %}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Author Studio</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold mb-1" style="color: var(--color-navy-950);">
+                    Welcome, {{ user.get_full_name|default:user.username }} 👋
+                </h1>
+                <p class="text-muted mb-0">Manage your published insights, drafts, analytics, and readership stats.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'blog:profile' %}" class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center">
+                    <i class="bi bi-person-gear me-1"></i> Edit Profile
+                </a>
+                <a href="{% url 'blog:post_create' %}" class="btn btn-orange btn-sm d-inline-flex align-items-center shadow-sm">
+                    <i class="bi bi-pencil-square me-1"></i> Write New Post
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Analytics Metric Cards -->
+    <div class="row g-3 mb-4">
+        <!-- Total Posts -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="dashboard-stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #1c2541, #3a506b);">
+                    <i class="bi bi-journal-text"></i>
+                </div>
+                <div class="stat-number">{{ total_posts }}</div>
+                <div class="stat-label">Total Articles</div>
+            </div>
+        </div>
+
+        <!-- Published Posts -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="dashboard-stat-card">
+                <div class="stat-icon" style="background: var(--gradient-teal-purple);">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div class="stat-number" style="color: var(--color-teal-600);">{{ published_count }}</div>
+                <div class="stat-label">Published Live</div>
+            </div>
+        </div>
+
+        <!-- Drafts -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="dashboard-stat-card">
+                <div class="stat-icon" style="background: var(--gradient-orange);">
+                    <i class="bi bi-file-earmark-lock"></i>
+                </div>
+                <div class="stat-number" style="color: var(--color-orange-600);">{{ draft_count }}</div>
+                <div class="stat-label">Private Drafts</div>
+            </div>
+        </div>
+
+        <!-- Total Views -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="dashboard-stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                    <i class="bi bi-eye-fill"></i>
+                </div>
+                <div class="stat-number" style="color: var(--color-purple-600);">{{ total_views }}</div>
+                <div class="stat-label">Total Views</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Table & Filters -->
+    <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden" style="border: 1px solid var(--color-border) !important;">
+        <!-- Header with Tabs & Search -->
+        <div class="card-header bg-white p-3 border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <!-- Filter Tabs -->
+            <ul class="nav nav-pills small">
+                <li class="nav-item">
+                    <a class="nav-link {% if status_filter == 'all' %}active bg-dark{% else %}text-muted{% endif %} rounded-pill px-3 py-1" href="?status=all{% if search_q %}&q={{ search_q }}{% endif %}">
+                        All ({{ total_posts }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if status_filter == 'published' %}active bg-teal-500 text-white{% else %}text-muted{% endif %} rounded-pill px-3 py-1" style="{% if status_filter == 'published' %}background-color: var(--color-teal-500) !important;{% endif %}" href="?status=published{% if search_q %}&q={{ search_q }}{% endif %}">
+                        Published ({{ published_count }})
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if status_filter == 'draft' %}active bg-warning text-dark{% else %}text-muted{% endif %} rounded-pill px-3 py-1" href="?status=draft{% if search_q %}&q={{ search_q }}{% endif %}">
+                        Drafts ({{ draft_count }})
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Search form -->
+            <form method="GET" class="d-flex" style="max-width: 320px;">
+                <input type="hidden" name="status" value="{{ status_filter }}">
+                <div class="input-group input-group-sm">
+                    <input type="text" name="q" class="form-control" placeholder="Search your articles..." value="{{ search_q }}">
+                    <button class="btn btn-outline-secondary" type="submit">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    {% if search_q %}
+                    <a href="?status={{ status_filter }}" class="btn btn-outline-secondary" title="Clear search">
+                        <i class="bi bi-x"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Posts Table -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col" style="min-width: 280px;">Article Title</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" class="text-center">Views</th>
+                        <th scope="col" class="text-center">Comments</th>
+                        <th scope="col">Last Modified</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in page_obj %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                {% if post.featured_image %}
+                                    <img src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="rounded-2" style="width: 48px; height: 48px; object-fit: cover;">
+                                {% else %}
+                                    <div class="rounded-2 bg-light d-flex align-items-center justify-content-center text-muted" style="width: 48px; height: 48px; border: 1px solid var(--color-border);">
+                                        <i class="bi bi-file-earmark-text fs-5"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0 fw-bold">
+                                        <a href="{{ post.get_absolute_url }}" class="text-navy text-decoration-none">
+                                            {{ post.title|truncatechars:55 }}
+                                        </a>
+                                    </h6>
+                                    <small class="text-muted">{{ post.reading_time|reading_badge }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if post.category %}
+                                <span class="badge bg-light text-dark border rounded-pill">{{ post.category.name }}</span>
+                            {% else %}
+                                <span class="text-muted small">None</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if post.status == 'published' %}
+                                <span class="badge-status-published">
+                                    <i class="bi bi-check2-circle me-1"></i> Published
+                                </span>
+                            {% else %}
+                                <span class="badge-status-draft">
+                                    <i class="bi bi-clock-history me-1"></i> Draft
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-muted border">{{ post.views_count }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-light text-muted border">{{ post.comment_count }}</span>
+                        </td>
+                        <td class="text-muted small">
+                            {{ post.updated_at|date:"M d, Y" }}
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ post.get_absolute_url }}" class="btn btn-outline-secondary" title="View Article">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'blog:post_edit' post.slug %}" class="btn btn-outline-teal" title="Edit Article">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'blog:post_toggle_status' post.slug %}" class="btn btn-outline-secondary" title="Toggle Status (Draft / Publish)">
+                                    {% if post.status == 'published' %}
+                                        <i class="bi bi-eye-slash" title="Set to Draft"></i>
+                                    {% else %}
+                                        <i class="bi bi-cloud-arrow-up text-success" title="Publish Post"></i>
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'blog:post_delete' post.slug %}" class="btn btn-outline-danger" title="Delete Article">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-journal-plus display-6 d-block mb-2 text-teal-400"></i>
+                            <h5 class="fw-bold">No articles match your query</h5>
+                            <p class="small text-muted mb-3">Start writing your ideas now and share them with the world.</p>
+                            <a href="{% url 'blog:post_create' %}" class="btn btn-sm btn-orange">
+                                <i class="bi bi-pencil-square me-1"></i> Write New Post
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Dashboard Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-white border-top p-3 d-flex justify-content-center">
+            <nav aria-label="Dashboard page navigation">
+                <ul class="pagination pagination-sm pagination-custom mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% url_replace page=page_obj.previous_page_number %}">Prev</a>
+                        </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?{% url_replace page=num %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% url_replace page=page_obj.next_page_number %}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
